@@ -1,73 +1,77 @@
-let listaDeNumerosSorteados = [];
-let numeroLimite = 10;
-let numeroSecreto = gerarNumeroAleatorio();
-let tentativas = 1;
+function sortear(){
+    let quantidade =    parseInt(document.getElementById('quantidade').value);
+    let de =            parseInt(document.getElementById('de').value);
+    let ate =           parseInt(document.getElementById('ate').value);
 
-function exibirTextoNaTela(tag, texto) {
-    let campo = document.querySelector(tag);
-    campo.innerHTML = texto;
-    responsiveVoice.speak(texto, 'Brazilian Portuguese Female', {rate:1.2});
+while(!quantidade || !de || !ate) {
+    alert('Por favor, preencha todos os valores corretamente para efetuar o sorteio.');
+    return;
 }
 
-function exibirMensagemInicial() {
-    exibirTextoNaTela('h1', 'Jogo do número secreto');
-    exibirTextoNaTela('p', 'Escolha um número entre 1 e 10');
+    if (de >= ate) {
+        alert('Campo "Do número" deve ser inferior ao campo "Até o número"');
+        return;
+    }
+
+if( ((ate - de) - quantidade) < 0) {
+    alert('Intervalo é menor que o número selecionado, por favor altere.')
+    return;
 }
+    let sorteados = [];
+    let numero;
 
-exibirMensagemInicial();
 
-function verificarChute() {
-    let chute = document.querySelector('input').value;
-    
-    if (chute == numeroSecreto) {
-        exibirTextoNaTela('h1', 'Acertou!');
-        let palavraTentativa = tentativas > 1 ? 'tentativas' : 'tentativa';
-        let mensagemTentativas = `Você descobriu o número secreto com ${tentativas} ${palavraTentativa}!`;
-        exibirTextoNaTela('p', mensagemTentativas);
-        document.getElementById('reiniciar').removeAttribute('disabled');
-    } else {
-        if (chute > numeroSecreto) {
-            exibirTextoNaTela('p', 'O número secreto é menor');
-        } else {
-            exibirTextoNaTela('p', 'O número secreto é maior');
+    for (let i = 0; i < quantidade ; i++) {
+        numero = obterNumeroAleatorio(de, ate);
+
+        while (sorteados.includes(numero)) {
+            numero = obterNumeroAleatorio(de, ate);
         }
-        tentativas++;
-        limparCampo();
-    }
+
+        sorteados.push(numero);
 }
 
-function gerarNumeroAleatorio() {
-    let numeroEscolhido = parseInt(Math.random() * numeroLimite + 1);
-    let quantidadeDeElementosNaLista = listaDeNumerosSorteados.length;
+    let resultado = document.getElementById('resultado');
+    resultado.innerHTML = `<label class="texto__paragrafo">Números sorteados:  ${sorteados}</label>`;
+    alterarStatusBotaoReiniciar();
+    alterarStatusBotaoSortear();
+}
 
-    if (quantidadeDeElementosNaLista == numeroLimite) {
-        listaDeNumerosSorteados = [];
-    }
-    if (listaDeNumerosSorteados.includes(numeroEscolhido)) {
-        return gerarNumeroAleatorio();
+function obterNumeroAleatorio(min, max){
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function alterarStatusBotaoSortear() {
+    let botaoSortear = document.getElementById('btn-sortear');
+
+    if( botaoSortear.classList.contains('container__botao')) {
+        botaoSortear.classList.remove('container__botao');
+        botaoSortear.classList.add('container__botao-desabilitado');
     } else {
-        listaDeNumerosSorteados.push(numeroEscolhido);
-        console.log(listaDeNumerosSorteados)
-        return numeroEscolhido;
+        botaoSortear.classList.remove('container__botao-desabilitado');
+        botaoSortear.classList.add('container__botao');
     }
 }
 
-function limparCampo() {
-    chute = document.querySelector('input');
-    chute.value = '';
+function alterarStatusBotaoReiniciar() {
+    let botaoReiniciar = document.getElementById('btn-reiniciar');
+
+    if( botaoReiniciar.classList.contains('container__botao-desabilitado')) {
+        botaoReiniciar.classList.remove('container__botao-desabilitado');
+        botaoReiniciar.classList.add('container__botao');
+   } else {
+        botaoReiniciar.classList.remove('container__botao');
+        botaoReiniciar.classList.add('container__botao-desabilitado');
+
+
+    }
 }
 
-function reiniciarJogo() {
-    numeroSecreto = gerarNumeroAleatorio();
-    limparCampo();
-    tentativas = 1;
-    exibirMensagemInicial();
-    document.getElementById('reiniciar').setAttribute('disabled', true)
+function reiniciar() {
+    document.getElementById('quantidade').value = '';
+    document.getElementById('de').value = '';
+    document.getElementById('ate').value = '';
+    document.getElementById('resultado').innerHTML = '<label class="texto__paragrafo">Números sorteados:  nenhum até agora</label>';
+    alterarStatusBotaoReiniciar();
+    alterarStatusBotaoSortear();
 }
-
-
-
-
-
-
-
